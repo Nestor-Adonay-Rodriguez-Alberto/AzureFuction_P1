@@ -1,12 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DataAccess.Persistence.Configuration;
+using DataAccess.Persistence.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess
 {
-    internal class MyDBcontext
+    public class MyDBcontext: DbContext
     {
+        public MyDBcontext(DbContextOptions<MyDBcontext> options) 
+            : base(options) 
+        {
+        }
+
+        // Tablas En DB:
+        public DbSet<Empleado> Empleados { get; set; }
+
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // T-Empleados
+            modelBuilder.ApplyConfiguration(new EmpleadoConfiguration());
+        }
+
+
     }
+
 }
