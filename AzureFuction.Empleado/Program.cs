@@ -11,7 +11,7 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 // INYECCION DE LA DB:
 var connectionString = builder.Configuration["DbConnectionString"];
-builder.Services.AddDbContext<MyDBcontext>(options =>
+builder.Services.AddDbContext<DataAccess.DbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.ConfigureFunctionsWebApplication();
