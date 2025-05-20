@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Domain.Entidades;
+using System;
 
 namespace Domain.Repositories
 {
-    public interface IEmpleado<T>
+    public interface IEmpleado
     {
-        Task CreateEmpleado(T empleado);
-        Task EditarEmpleado(T empleado);
-        Task EliminarEmpleado(T empleado);
-        Task<T> Obtener_PoId(int Id);
-        Task<List<T>> ListarEmpleados();
+        Task CreateEmpleado(Empleado empleado);
+        Task EditarEmpleado(Empleado empleado);
+        Task EliminarEmpleado(Empleado empleado);
+        Task<Empleado> Obtener_PoId(int Id);
+        Task<List<Empleado>> ListarEmpleados();
     }
 }

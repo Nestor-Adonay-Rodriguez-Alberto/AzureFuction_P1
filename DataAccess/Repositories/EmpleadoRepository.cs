@@ -1,10 +1,12 @@
-﻿using DataAccess.Persistence.Models;
+﻿
+using DataAccess.Persistence.Models;
+using Domain.Entidades;
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories
 {
-    public class EmpleadoRepository : IEmpleado<Empleado>
+    public class EmpleadoRepository : IEmpleado
     {
         private readonly DbContext _dbContext;
 
@@ -19,22 +21,39 @@ namespace DataAccess.Repositories
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
-               _dbContext.Empleados.Add(empleado);
-               await _dbContext.SaveChangesAsync();
-               await transaction.CommitAsync();
+                EmpleadoEntity entity = MapToEntity(empleado);
+                _dbContext.Empleados.Add(entity);
+
+                await _dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
             }
             catch (Exception ex) 
             {
                 await transaction.RollbackAsync();
-                Console.WriteLine($"Error al agregar la reservación: {ex.Message}");
+                Console.WriteLine($"Error al crear el Empleado: {ex.Message}");
                 throw;
             }
 
         }
 
-        public Task EditarEmpleado(Empleado empleado)
+
+        public async Task EditarEmpleado(Empleado empleado)
         {
-            throw new NotImplementedException();
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                EmpleadoEntity? objetoObtenido = await _dbContext.Empleados.FindAsync(empleado.Id);
+                _dbContext.Entry(objetoObtenido).CurrentValues.SetValues(empleado);
+
+                await _dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();                 
+            }
+            catch (Exception ex) 
+            {
+                await transaction.RollbackAsync();
+                Console.WriteLine($"Error al Actualizar el Empleado: {ex.Message}");
+                throw;
+            }
         }
 
         public Task EliminarEmpleado(Empleado empleado)
@@ -51,5 +70,21 @@ namespace DataAccess.Repositories
         {
             throw new NotImplementedException();
         }
+
+
+       
+        private EmpleadoEntity MapToEntity(Empleado empleado)
+        {
+            EmpleadoEntity empleadoEntity = new()
+            {
+                Id = empleado.Id,
+                Nombre = empleado.Nombre,
+                Edad = empleado.Edad,
+                Direccion = empleado.Direccion
+            };
+
+            return empleadoEntity;
+        }
+
     }
 }

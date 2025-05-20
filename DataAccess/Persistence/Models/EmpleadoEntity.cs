@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Persistence.Models
 {
-    public class Empleado
+    public class EmpleadoEntity
     {
         public int Id { get; set; }
         public string Nombre { get; set; }

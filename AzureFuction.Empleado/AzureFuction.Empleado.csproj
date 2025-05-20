@@ -19,7 +19,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Aplication\Services\" />
     <Folder Include="Controllers\" />
   </ItemGroup>
   <ItemGroup>

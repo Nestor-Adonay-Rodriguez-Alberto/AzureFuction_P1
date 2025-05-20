@@ -13,7 +13,7 @@ namespace DataAccess
         }
 
         // Tablas En DB:
-        public DbSet<Empleado> Empleados { get; set; }
+        public DbSet<EmpleadoEntity> Empleados { get; set; }
 
 
 

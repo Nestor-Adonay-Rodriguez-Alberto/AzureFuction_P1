@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataAccess.Persistence.Configuration
 {
-    public class EmpleadoConfiguration : IEntityTypeConfiguration<Empleado>
+    public class EmpleadoConfiguration : IEntityTypeConfiguration<EmpleadoEntity>
     {
-        public void Configure(EntityTypeBuilder<Empleado> builder)
+        public void Configure(EntityTypeBuilder<EmpleadoEntity> builder)
         {
             builder.ToTable("Empleados", "dbo"); 
             builder.HasKey(e => e.Id);
