@@ -1,12 +1,7 @@
 ﻿using AzureFuction.Empleado.Aplication.DTOs.Models;
 using AzureFuction.Empleado.Aplication.DTOs.Responses;
-using Domain.Entidades;
 using Domain.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace AzureFuction.Empleado.Aplication.Services
 {
