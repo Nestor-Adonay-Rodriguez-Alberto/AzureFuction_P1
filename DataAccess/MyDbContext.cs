@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess
 {
-    public class DbContext: Microsoft.EntityFrameworkCore.DbContext
+    public class MyDbContext: Microsoft.EntityFrameworkCore.DbContext
     {
-        public DbContext(DbContextOptions<DbContext> options) 
+        public MyDbContext(DbContextOptions<MyDbContext> options) 
             : base(options) 
         {
         }

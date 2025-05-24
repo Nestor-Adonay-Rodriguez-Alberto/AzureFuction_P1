@@ -40,7 +40,7 @@ namespace AzureFuction.Empleado.Controllers
             }
             catch (Exception ex) 
             {
-                _Logger.LogError($"Ocurrio Un Error.: {ex.Message}");
+                _Logger.LogError($"CREAR FN.: {ex.Message}");
                 return new BadRequestObjectResult(ex.Message);
             }
         }

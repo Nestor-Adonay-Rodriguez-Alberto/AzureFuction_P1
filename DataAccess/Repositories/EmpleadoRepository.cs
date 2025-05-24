@@ -8,29 +8,43 @@ namespace DataAccess.Repositories
 {
     public class EmpleadoRepository : IEmpleado
     {
-        private readonly DbContext _dbContext;
+        private readonly MyDbContext _dbContext;
 
-        public EmpleadoRepository(DbContext dbContext)
+        public EmpleadoRepository(MyDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
 
-        public async Task CreateEmpleado(Empleado empleado)
+        public async Task CreateEmpleado(Empleado newEmpleado)
         {
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
-                EmpleadoEntity entity = MapToEntity(empleado);
-                _dbContext.Empleados.Add(entity);
+                if (newEmpleado.Id == 0) 
+                {
+                    EmpleadoEntity entity = MapToEntity(newEmpleado);
+                    _dbContext.Empleados.Add(entity);
 
-                await _dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
+                    await _dbContext.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                else
+                {   
+                    var existingEmpleado = newEmpleado.Id > 0 ? 
+                        await _dbContext.Empleados.FirstOrDefaultAsync(x=> x.Id==newEmpleado.Id) : null;
+
+                    EmpleadoEntity entity = MapToEntity(newEmpleado);
+                    _dbContext.Entry(existingEmpleado).CurrentValues.SetValues(entity);
+                    await _dbContext.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                
             }
             catch (Exception ex) 
             {
                 await transaction.RollbackAsync();
-                Console.WriteLine($"Error al crear el Empleado: {ex.Message}");
+                Console.WriteLine($"CREAR DB: {ex.Message}");
                 throw;
             }
 
@@ -66,9 +80,20 @@ namespace DataAccess.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Empleado> Obtener_PoId(int Id)
+        public async Task<Empleado> Obtener_PoId(int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                EmpleadoEntity empleadoEntity = await _dbContext.Empleados.FirstOrDefaultAsync(x=> x.Id == Id);
+                Empleado empleado = MapToDomain(empleadoEntity);
+
+                return empleado;
+            }
+            catch (Exception ex) 
+            {
+                Console.WriteLine($"Error al Obtener el Empleado: {ex.Message}");
+                throw;
+            }
         }
 
 
@@ -85,6 +110,20 @@ namespace DataAccess.Repositories
 
             return empleadoEntity;
         }
+
+        private Empleado MapToDomain(EmpleadoEntity empleadoEntity)
+        {
+            Empleado empleado = new()
+            {
+                Id = empleadoEntity.Id,
+                Nombre = empleadoEntity.Nombre,
+                Edad = empleadoEntity.Edad,
+                Direccion = empleadoEntity.Direccion
+            };
+
+            return empleado;
+        }
+
 
     }
 }
