@@ -41,7 +41,6 @@ namespace AzureFuction.Empleado.Aplication.Services
             }
             catch (Exception ex)
             { 
-                Console.WriteLine($"CREAR SERVICE: {ex.Message}");
                 throw;
             }
         }

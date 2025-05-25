@@ -36,6 +36,7 @@ namespace DataAccess.Repositories
 
                     EmpleadoEntity entity = MapToEntity(newEmpleado);
                     _dbContext.Entry(existingEmpleado).CurrentValues.SetValues(entity);
+
                     await _dbContext.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
@@ -44,30 +45,9 @@ namespace DataAccess.Repositories
             catch (Exception ex) 
             {
                 await transaction.RollbackAsync();
-                Console.WriteLine($"CREAR DB: {ex.Message}");
-                throw;
+                throw ex;
             }
 
-        }
-
-
-        public async Task EditarEmpleado(Empleado empleado)
-        {
-            using var transaction = await _dbContext.Database.BeginTransactionAsync();
-            try
-            {
-                EmpleadoEntity? objetoObtenido = await _dbContext.Empleados.FindAsync(empleado.Id);
-                _dbContext.Entry(objetoObtenido).CurrentValues.SetValues(empleado);
-
-                await _dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();                 
-            }
-            catch (Exception ex) 
-            {
-                await transaction.RollbackAsync();
-                Console.WriteLine($"Error al Actualizar el Empleado: {ex.Message}");
-                throw;
-            }
         }
 
         public Task EliminarEmpleado(Empleado empleado)
@@ -91,10 +71,10 @@ namespace DataAccess.Repositories
             }
             catch (Exception ex) 
             {
-                Console.WriteLine($"Error al Obtener el Empleado: {ex.Message}");
-                throw;
+                throw ex;
             }
         }
+
 
 
        
