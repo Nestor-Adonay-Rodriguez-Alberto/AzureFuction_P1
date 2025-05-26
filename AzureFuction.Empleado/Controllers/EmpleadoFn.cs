@@ -23,7 +23,7 @@ namespace AzureFuction.Empleado.Controllers
         }
 
 
-        [Function("fn-save-empleado")]
+        [Function("fn-save-empleado")] // CREAR - ACTUALIZAR
         public async Task<IActionResult> CreateEmpleado([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "azure-fuction/crear-empleado")] HttpRequest req)
         {
             EmpleadoService _service = new(_EmpleadoRepository);
