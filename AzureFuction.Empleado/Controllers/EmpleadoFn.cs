@@ -55,6 +55,7 @@ namespace AzureFuction.Empleado.Controllers
             _Logger.LogInformation("Obteniendo por ID...");
             EmpleadoService _service = new(_EmpleadoRepository);
 
+
             try
             {
                 ResponseDTO<EmpleadoDTO> response = await _service.Obtener_PoId(id);
