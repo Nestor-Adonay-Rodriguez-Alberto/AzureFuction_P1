@@ -16,6 +16,7 @@ namespace DataAccess.Repositories
         }
 
 
+        // CREAR - ACTUALIZAR
         public async Task CreateEmpleado(Empleado newEmpleado)
         {
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
@@ -50,6 +51,24 @@ namespace DataAccess.Repositories
 
         }
 
+        // OBTENER POR ID:
+        public async Task<Empleado> Obtener_PoId(int Id)
+        {
+            try
+            {
+                EmpleadoEntity empleadoEntity = await _dbContext.Empleados.FirstOrDefaultAsync(x => x.Id == Id);
+                Empleado empleado = MapToDomain(empleadoEntity);
+
+                return empleado;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+
         public Task EliminarEmpleado(Empleado empleado)
         {
             throw new NotImplementedException();
@@ -60,20 +79,6 @@ namespace DataAccess.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<Empleado> Obtener_PoId(int Id)
-        {
-            try
-            {
-                EmpleadoEntity empleadoEntity = await _dbContext.Empleados.FirstOrDefaultAsync(x=> x.Id == Id);
-                Empleado empleado = MapToDomain(empleadoEntity);
-
-                return empleado;
-            }
-            catch (Exception ex) 
-            {
-                throw ex;
-            }
-        }
 
 
 

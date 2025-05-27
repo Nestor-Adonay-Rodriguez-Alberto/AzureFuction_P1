@@ -23,12 +23,13 @@ namespace AzureFuction.Empleado.Controllers
         }
 
 
-        [Function("fn-save-empleado")] // CREAR - ACTUALIZAR
+        // CREAR - ACTUALIZAR:
+        [Function("fn-save-empleado")]
         public async Task<IActionResult> CreateEmpleado([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "azure-fuction/crear-empleado")] HttpRequest req)
         {
+            _Logger.LogInformation("Creando El Empleado...");
             EmpleadoService _service = new(_EmpleadoRepository);
 
-            _Logger.LogInformation("Creando El Empleado...");
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var empleado = JsonConvert.DeserializeObject<EmpleadoDTO>(requestBody);
 
@@ -46,6 +47,28 @@ namespace AzureFuction.Empleado.Controllers
         }
 
 
+
+        // OBTENER POR ID:
+        [Function("fn-get-empleado")]
+        public async Task<IActionResult> Obtener_PoId([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "azure-fuction/get-empleado/{id}")] HttpRequest req, int id)
+        {
+            _Logger.LogInformation("Obteniendo por ID...");
+            EmpleadoService _service = new(_EmpleadoRepository);
+
+            try
+            {
+                ResponseDTO<EmpleadoDTO> response = await _service.Obtener_PoId(id);
+
+                return new OkObjectResult(response);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"Error al obtener...: {ex.Message}");
+                return new BadRequestObjectResult(ex.Message);
+            }
+            throw new NotImplementedException();
+        }
+            
 
     }
 }
