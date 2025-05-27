@@ -16,6 +16,7 @@ namespace DataAccess.Repositories
         }
 
 
+
         // CREAR - ACTUALIZAR
         public async Task CreateEmpleado(Empleado newEmpleado)
         {
@@ -51,6 +52,7 @@ namespace DataAccess.Repositories
 
         }
 
+
         // OBTENER POR ID:
         public async Task<Empleado> Obtener_PoId(int Id)
         {
@@ -68,12 +70,30 @@ namespace DataAccess.Repositories
         }
 
 
-
-        public Task EliminarEmpleado(Empleado empleado)
+        // ELIMINA POR ID:
+        public async Task EliminarEmpleado(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                EmpleadoEntity? empleadoEntity = await _dbContext.Empleados.FirstOrDefaultAsync(x => x.Id == id);
+
+                if (empleadoEntity == null)
+                {
+                    throw new InvalidOperationException($"No se encontró el empleado con ID {id}.");
+                }
+
+                _dbContext.Empleados.Remove(empleadoEntity);
+                await _dbContext.SaveChangesAsync();
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
+
+        // OBTENER TODOS:
         public Task<List<Empleado>> ListarEmpleados()
         {
             throw new NotImplementedException();

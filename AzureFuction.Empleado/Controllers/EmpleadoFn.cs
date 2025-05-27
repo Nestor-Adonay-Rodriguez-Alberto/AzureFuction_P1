@@ -23,6 +23,7 @@ namespace AzureFuction.Empleado.Controllers
         }
 
 
+
         // CREAR - ACTUALIZAR:
         [Function("fn-save-empleado")]
         public async Task<IActionResult> CreateEmpleado([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "azure-fuction/crear-empleado")] HttpRequest req)
@@ -47,14 +48,12 @@ namespace AzureFuction.Empleado.Controllers
         }
 
 
-
         // OBTENER POR ID:
         [Function("fn-get-empleado")]
         public async Task<IActionResult> Obtener_PoId([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "azure-fuction/get-empleado/{id}")] HttpRequest req, int id)
         {
             _Logger.LogInformation("Obteniendo por ID...");
             EmpleadoService _service = new(_EmpleadoRepository);
-
 
             try
             {
@@ -67,9 +66,31 @@ namespace AzureFuction.Empleado.Controllers
                 _Logger.LogError($"Error al obtener...: {ex.Message}");
                 return new BadRequestObjectResult(ex.Message);
             }
-            throw new NotImplementedException();
+
         }
-            
+
+
+        // ELIMINAR POR ID:
+        [Function("fn-delete-empleado")]
+        public async Task<IActionResult> EliminarEmpleado([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "azure-fuction/delete-empleado/{id}")] HttpRequest req, int id)
+        {
+            _Logger.LogInformation("Eliminando por ID...");
+            EmpleadoService _service = new(_EmpleadoRepository);
+
+            try
+            {
+                ResponseDTO<EmpleadoDTO> response = await _service.EliminarEmpleado(id);
+
+                return new OkObjectResult(response);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"Error al Eliminar...: {ex.Message}");
+                return new BadRequestObjectResult(ex.Message);
+            }
+
+        }
+
 
     }
 }

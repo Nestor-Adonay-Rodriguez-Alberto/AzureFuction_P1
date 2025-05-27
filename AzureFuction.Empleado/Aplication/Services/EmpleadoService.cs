@@ -17,6 +17,7 @@ namespace AzureFuction.Empleado.Aplication.Services
         }
 
 
+
         // CREAR - ACTUALIZAR
         public async Task<ResponseDTO<EmpleadoDTO>> CreateEmpleado(EmpleadoDTO empleadoDTO)
         {
@@ -70,6 +71,31 @@ namespace AzureFuction.Empleado.Aplication.Services
                 throw;
             }
         }
+
+
+        // ELIMINAR POR ID:
+        public async Task<ResponseDTO<EmpleadoDTO>> EliminarEmpleado(int id)
+        {
+            try
+            {
+                await _EmpleadoRepository.EliminarEmpleado(id);
+
+                ResponseDTO<EmpleadoDTO> response = new()
+                {
+                    Message = "Empleado Eliminado",
+                    Status = true,
+                    Data = null
+                };
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
 
 
         // Entidad a DTO:
