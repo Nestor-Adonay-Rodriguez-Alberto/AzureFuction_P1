@@ -3,6 +3,7 @@ using AzureFuction.Empleado.Aplication.DTOs.Responses;
 using DataAccess.Persistence.Models;
 using Domain.Entidades;
 using Domain.Repositories;
+using System.Drawing.Printing;
 
 
 namespace AzureFuction.Empleado.Aplication.Services
@@ -97,6 +98,32 @@ namespace AzureFuction.Empleado.Aplication.Services
 
 
 
+        // LISTADO DE REGISTROS:
+        public async Task<PaginatedResponseDTO<List<EmpleadoDTO>>> ListarEmpleados(string search, int page, int pageSize)
+        {
+            try
+            {
+                var (totalCount, listItems) = await _EmpleadoRepository.ListarEmpleados(search, page, pageSize);
+
+                List<EmpleadoDTO> listaEmpleados = MapListToDTO(listItems);
+
+                PaginatedResponseDTO<List<EmpleadoDTO>> response = new()
+                {
+                    Message = "Lista Empleados Obtenida",
+                    Status = true,
+                    Data = listaEmpleados,
+                    Count = totalCount
+                };
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
 
         // Entidad a DTO:
         private EmpleadoDTO MapToDTO(Domain.Entidades.Empleado empleado)
@@ -110,6 +137,26 @@ namespace AzureFuction.Empleado.Aplication.Services
             };
 
             return empleadoDTO;
+        }
+
+
+        // Lista Entidad a DTO:
+        private List<EmpleadoDTO> MapListToDTO(List<Domain.Entidades.Empleado> empleados)
+        {
+            List<EmpleadoDTO> listEmpleadoDTO = new();
+
+            foreach (Domain.Entidades.Empleado empleado in empleados)
+            {
+                listEmpleadoDTO.Add(new EmpleadoDTO
+                {
+                    Id = empleado.Id,
+                    Nombre = empleado.Nombre,
+                    Edad = empleado.Edad,
+                    Direccion = empleado.Direccion
+                });
+            }
+
+            return listEmpleadoDTO;
         }
 
 

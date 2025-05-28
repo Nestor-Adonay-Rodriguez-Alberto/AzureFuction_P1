@@ -92,5 +92,41 @@ namespace AzureFuction.Empleado.Controllers
         }
 
 
+        // LISTADO DE REGISTROS:
+        [Function("fn-list-empleados")]
+        public async Task<IActionResult> ListarEmpleados([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "azure-fuction/list-empleado")] HttpRequest req)
+        {
+            _Logger.LogInformation("Obteniendo Todos Los Empleados...");
+            EmpleadoService _service = new(_EmpleadoRepository);
+
+            string search = req.Query.ContainsKey("search") ? req.Query["search"].ToString() : string.Empty;
+            int page = 1;
+            int pageSize = 20;
+
+            if (req.Query.ContainsKey("page") && int.TryParse(req.Query["page"], out int parsedPage))
+            {
+                page = parsedPage;
+            }
+
+            if (req.Query.ContainsKey("pageSize") && int.TryParse(req.Query["pageSize"], out int parsedPageSize))
+            {
+                pageSize = parsedPageSize;
+            }
+
+            try
+            {
+                PaginatedResponseDTO<List<EmpleadoDTO>> response = await _service.ListarEmpleados(search, page, pageSize);
+
+                return new OkObjectResult(response);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"Error al obtener todos los registros...: {ex.Message}");
+                return new BadRequestObjectResult(ex.Message);
+            }
+
+        }
+
+
     }
 }

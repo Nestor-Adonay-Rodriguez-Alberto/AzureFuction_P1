@@ -93,16 +93,53 @@ namespace DataAccess.Repositories
         }
 
 
-        // OBTENER TODOS:
-        public Task<List<Empleado>> ListarEmpleados()
+        // LISTADO DE REGISTROS:
+        public async Task<(int, List<Empleado>)> ListarEmpleados(string search, int page, int pageSize)
         {
-            throw new NotImplementedException();
+
+            if (string.IsNullOrWhiteSpace(search) || search == "null" || search == "undefined")
+            {
+                return await GetAll(page, pageSize);
+            }
+
+            return await Search(search, page, pageSize);
+        }
+
+
+        // OBTIENE TODO PAGINADOS:
+        private async Task<(int, List<Empleado>)> GetAll(int page, int pageSize)
+        {
+            IQueryable<EmpleadoEntity> query = _dbContext.Empleados;
+
+            return await PaginarQuery(query, page, pageSize);
+        }
+
+
+        // OBTIENE SOLO LOS QUE COINCIDEN:
+        private async Task<(int, List<Empleado>)> Search(string search, int page, int pageSize)
+        {
+            IQueryable<EmpleadoEntity> query = _dbContext.Empleados;
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim().ToLower();
+                bool isNumeric = int.TryParse(term, out int edadBuscada);
+
+                query = query.Where(x =>
+                    x.Nombre.ToLower().Contains(term) ||
+                    x.Direccion.ToLower().Contains(term) ||
+                    (isNumeric && x.Edad == edadBuscada)
+                );
+            }
+
+            return await PaginarQuery(query, page, pageSize);
         }
 
 
 
 
-       
+
+        // MAPEA DE ENTIDAD A ENTITY-Obj:
         private EmpleadoEntity MapToEntity(Empleado empleado)
         {
             EmpleadoEntity empleadoEntity = new()
@@ -116,6 +153,7 @@ namespace DataAccess.Repositories
             return empleadoEntity;
         }
 
+        // MAPEA DE ENTITY A ENTIDAD-obj:
         private Empleado MapToDomain(EmpleadoEntity empleadoEntity)
         {
             Empleado empleado = new()
@@ -127,6 +165,41 @@ namespace DataAccess.Repositories
             };
 
             return empleado;
+        }
+
+        // MAPEA DE ENTITY A ENTIDAD-list:
+        private List<Empleado> MapListToEntidad(List<EmpleadoEntity> empleados)
+        {
+            List<Empleado> listEmpleados = new();
+
+            foreach (EmpleadoEntity empleado in empleados)
+            {
+                listEmpleados.Add(new Empleado
+                {
+                    Id = empleado.Id,
+                    Nombre = empleado.Nombre,
+                    Edad = empleado.Edad,
+                    Direccion = empleado.Direccion
+                });
+            }
+
+            return listEmpleados;
+        }
+
+        // GENERA EL PAGINADO:
+        private async Task<(int, List<Empleado>)> PaginarQuery(IQueryable<EmpleadoEntity> query, int page, int pageSize)
+        {
+            var totalCount = await query.CountAsync();
+
+            var registros = await query
+                .OrderByDescending(x => x.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var empleadosList = MapListToEntidad(registros);
+
+            return (totalCount, empleadosList);
         }
 
 
