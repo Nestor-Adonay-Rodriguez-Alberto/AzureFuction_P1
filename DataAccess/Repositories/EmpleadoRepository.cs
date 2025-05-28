@@ -96,28 +96,6 @@ namespace DataAccess.Repositories
         // LISTADO DE REGISTROS:
         public async Task<(int, List<Empleado>)> ListarEmpleados(string search, int page, int pageSize)
         {
-
-            if (string.IsNullOrWhiteSpace(search) || search == "null" || search == "undefined")
-            {
-                return await GetAll(page, pageSize);
-            }
-
-            return await Search(search, page, pageSize);
-        }
-
-
-        // OBTIENE TODO PAGINADOS:
-        private async Task<(int, List<Empleado>)> GetAll(int page, int pageSize)
-        {
-            IQueryable<EmpleadoEntity> query = _dbContext.Empleados;
-
-            return await PaginarQuery(query, page, pageSize);
-        }
-
-
-        // OBTIENE SOLO LOS QUE COINCIDEN:
-        private async Task<(int, List<Empleado>)> Search(string search, int page, int pageSize)
-        {
             IQueryable<EmpleadoEntity> query = _dbContext.Empleados;
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -134,7 +112,6 @@ namespace DataAccess.Repositories
 
             return await PaginarQuery(query, page, pageSize);
         }
-
 
 
 
@@ -191,13 +168,13 @@ namespace DataAccess.Repositories
         {
             var totalCount = await query.CountAsync();
 
-            var registros = await query
+            List<EmpleadoEntity> registros = await query
                 .OrderByDescending(x => x.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            var empleadosList = MapListToEntidad(registros);
+            List<Empleado> empleadosList = MapListToEntidad(registros);
 
             return (totalCount, empleadosList);
         }
