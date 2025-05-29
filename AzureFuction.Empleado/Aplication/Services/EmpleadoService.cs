@@ -112,7 +112,9 @@ namespace AzureFuction.Empleado.Aplication.Services
                     Message = "Lista Empleados Obtenida",
                     Status = true,
                     Data = listaEmpleados,
-                    Count = totalCount
+                    Count = totalCount,
+                    CurrentPage = page,
+                    PageSize = pageSize
                 };
 
                 return response;
