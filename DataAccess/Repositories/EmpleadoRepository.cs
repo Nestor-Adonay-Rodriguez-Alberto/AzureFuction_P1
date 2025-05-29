@@ -1,5 +1,4 @@
-﻿
-using DataAccess.Persistence.Models;
+﻿using DataAccess.Persistence.Models;
 using Domain.Entidades;
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -27,69 +26,60 @@ namespace DataAccess.Repositories
                 {
                     EmpleadoEntity entity = MapToEntity(newEmpleado);
                     _dbContext.Empleados.Add(entity);
-
                     await _dbContext.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
                 else
                 {   
-                    var existingEmpleado = newEmpleado.Id > 0 ? 
-                        await _dbContext.Empleados.FirstOrDefaultAsync(x=> x.Id==newEmpleado.Id) : null;
+                    var existingEmpleado = await _dbContext.Empleados.FirstOrDefaultAsync(x => x.Id == newEmpleado.Id);
+                    if (existingEmpleado == null)
+                    {
+                        throw new InvalidOperationException($"No se encontró el empleado con ID {newEmpleado.Id} para actualizar.");
+                    }
 
                     EmpleadoEntity entity = MapToEntity(newEmpleado);
                     _dbContext.Entry(existingEmpleado).CurrentValues.SetValues(entity);
-
                     await _dbContext.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
-                
             }
-            catch (Exception ex) 
+            catch (DbUpdateException ex)
             {
                 await transaction.RollbackAsync();
-                throw ex;
+                throw new InvalidOperationException("Error al guardar los cambios en la base de datos.", ex);
             }
-
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new InvalidOperationException("Error inesperado al procesar la operación.", ex);
+            }
         }
 
 
         // OBTENER POR ID:
         public async Task<Empleado> Obtener_PoId(int Id)
         {
-            try
+            EmpleadoEntity empleadoEntity = await _dbContext.Empleados.FirstOrDefaultAsync(x => x.Id == Id);
+            if (empleadoEntity == null)
             {
-                EmpleadoEntity empleadoEntity = await _dbContext.Empleados.FirstOrDefaultAsync(x => x.Id == Id);
-                Empleado empleado = MapToDomain(empleadoEntity);
-
-                return empleado;
+                throw new InvalidOperationException($"No se encontró el empleado con ID {Id}.");
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            return MapToDomain(empleadoEntity);
         }
 
 
         // ELIMINA POR ID:
         public async Task EliminarEmpleado(int id)
         {
-            try
+            EmpleadoEntity? empleadoEntity = await _dbContext.Empleados.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (empleadoEntity == null)
             {
-                EmpleadoEntity? empleadoEntity = await _dbContext.Empleados.FirstOrDefaultAsync(x => x.Id == id);
-
-                if (empleadoEntity == null)
-                {
-                    throw new InvalidOperationException($"No se encontró el empleado con ID {id}.");
-                }
-
-                _dbContext.Empleados.Remove(empleadoEntity);
-                await _dbContext.SaveChangesAsync();
-
+                throw new InvalidOperationException($"No se encontró el empleado con ID {id}.");
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
+
+            _dbContext.Empleados.Remove(empleadoEntity);
+            await _dbContext.SaveChangesAsync();
         }
 
 

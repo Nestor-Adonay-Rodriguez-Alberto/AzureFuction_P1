@@ -30,70 +30,49 @@ namespace AzureFuction.Empleado.Aplication.Services
                 Direccion = empleadoDTO.Direccion,
             };
             
-            try
+            await _EmpleadoRepository.CreateEmpleado(newEmpleado);
+
+            ResponseDTO<EmpleadoDTO> response = new()
             {
-                await _EmpleadoRepository.CreateEmpleado(newEmpleado);
+                Message = newEmpleado.Id > 0 ? "Se actualizo el Empleado" : "Se Creo el Empleado",
+                Status = true,
+                Data = empleadoDTO
+            };
 
-                ResponseDTO<EmpleadoDTO> response = new()
-                {
-                    Message = newEmpleado.Id > 0 ? "Se actualizo el Empleado":"Se Creo el Empleado",
-                    Status = true,
-                    Data = empleadoDTO
-                };
-
-                return response;
-            }
-            catch (Exception ex)
-            { 
-                throw;
-            }
+            return response;
         }
 
 
         // OBTENER POR ID:
         public async Task<ResponseDTO<EmpleadoDTO>> Obtener_PoId(int id)
         {
-            try
-            {
-                Domain.Entidades.Empleado empleado =  await _EmpleadoRepository.Obtener_PoId(id);
-                EmpleadoDTO empleadoDTO = MapToDTO(empleado);
+            Domain.Entidades.Empleado empleado = await _EmpleadoRepository.Obtener_PoId(id);
+            EmpleadoDTO empleadoDTO = MapToDTO(empleado);
 
-                ResponseDTO<EmpleadoDTO> response = new()
-                {
-                    Message = "Empleado Obtenido",
-                    Status = true,
-                    Data = empleadoDTO
-                };
-
-                return response;
-            }
-            catch (Exception ex)
+            ResponseDTO<EmpleadoDTO> response = new()
             {
-                throw;
-            }
+                Message = "Empleado Obtenido",
+                Status = true,
+                Data = empleadoDTO
+            };
+
+            return response;
         }
 
 
         // ELIMINAR POR ID:
         public async Task<ResponseDTO<EmpleadoDTO>> EliminarEmpleado(int id)
         {
-            try
-            {
-                await _EmpleadoRepository.EliminarEmpleado(id);
+            await _EmpleadoRepository.EliminarEmpleado(id);
 
-                ResponseDTO<EmpleadoDTO> response = new()
-                {
-                    Message = "Empleado Eliminado",
-                    Status = true,
-                    Data = null
-                };
-
-                return response;
-            }
-            catch (Exception ex)
+            ResponseDTO<EmpleadoDTO> response = new()
             {
-                throw;
-            }
+                Message = "Empleado Eliminado",
+                Status = true,
+                Data = null
+            };
+
+            return response;
         }
 
 
@@ -101,28 +80,21 @@ namespace AzureFuction.Empleado.Aplication.Services
         // LISTADO DE REGISTROS:
         public async Task<PaginatedResponseDTO<List<EmpleadoDTO>>> ListarEmpleados(string search, int page, int pageSize)
         {
-            try
+            var (totalCount, listItems) = await _EmpleadoRepository.ListarEmpleados(search, page, pageSize);
+
+            List<EmpleadoDTO> listaEmpleados = MapListToDTO(listItems);
+
+            PaginatedResponseDTO<List<EmpleadoDTO>> response = new()
             {
-                var (totalCount, listItems) = await _EmpleadoRepository.ListarEmpleados(search, page, pageSize);
+                Message = "Lista Empleados Obtenida",
+                Status = true,
+                Data = listaEmpleados,
+                Count = totalCount,
+                CurrentPage = page,
+                PageSize = pageSize
+            };
 
-                List<EmpleadoDTO> listaEmpleados = MapListToDTO(listItems);
-
-                PaginatedResponseDTO<List<EmpleadoDTO>> response = new()
-                {
-                    Message = "Lista Empleados Obtenida",
-                    Status = true,
-                    Data = listaEmpleados,
-                    Count = totalCount,
-                    CurrentPage = page,
-                    PageSize = pageSize
-                };
-
-                return response;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            return response;
         }
 
 
